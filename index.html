@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Maseehur & Ashia — The Royal Union 2028</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;700&family=Great+Vibes&family=Montserrat:wght@300;400;600&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold-primary: #e5b958;
+      --gold-light: #fff3c4;
+      --gold-dark: #997327;
+      --emerald-deep: #051a13;
+      --emerald-surface: #0a2d21;
+      --emerald-card: rgba(10, 45, 33, 0.9);
+      --cream: #faf7ee;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      background-color: var(--emerald-deep);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    #sparkle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(229, 185, 88, 0.08) 0%, transparent 60%),
+                  linear-gradient(180deg, #051a13 0%, #03110d 100%);
+      z-index: 0;
+    }
+
+    /* ENVELOPE SCREEN */
+    #envelope-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #0a2e22 0%, #04140f 100%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: opacity 0.8s ease, transform 0.8s ease;
+    }
+
+    .envelope-box {
+      position: relative;
+      width: 310px;
+      height: 210px;
+      background: #0d382a;
+      border: 2px solid var(--gold-primary);
+      border-radius: 8px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.8), 0 0 25px rgba(229, 185, 88, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+    }
+
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 155px solid transparent;
+      border-right: 155px solid transparent;
+      border-top: 105px solid #144e3b;
+      transform-origin: top;
+      transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 4;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+
+    .envelope-inner-paper {
+      position: absolute;
+      width: 85%;
+      height: 75%;
+      background: #fdfaf3;
+      border-radius: 4px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #0b3d2e;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .envelope-inner-paper span {
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: var(--gold-dark);
+    }
+
+    .wax-seal {
+      position: absolute;
+      top: 75px;
+      width: 65px;
+      height: 65px;
+      background: radial-gradient(circle, #f3d078 0%, #aa771c 100%);
+      border-radius: 50%;
+      border: 2px solid #ffecb3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3);
+      animation: pulseGlow 1.8s infinite alternate;
+    }
+
+    .wax-seal span {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.1rem;
+      color: #3b2804;
+      font-weight: 700;
+    }
+
+    .envelope-hint {
+      margin-top: 2rem;
+      font-size: 0.85rem;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: blinkText 1.5s infinite;
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); box-shadow: 0 0 15px rgba(229, 185, 88, 0.3); }
+      to { transform: scale(1.08); box-shadow: 0 0 25px rgba(229, 185, 88, 0.8); }
+    }
+
+    @keyframes blinkText {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+
+    .envelope-open .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+    .envelope-open .wax-seal {
+      transform: scale(0);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+    .envelope-open .envelope-inner-paper {
+      transform: translateY(-70px) scale(1.05);
+    }
+
+    /* MAIN INVITATION VIEW */
+    #main-content {
+      position: relative;
+      z-index: 2;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 2.5rem 1.2rem 5rem 1.2rem;
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    .show-content {
+      display: block !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    .royal-card {
+      background: var(--emerald-card);
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 20px;
+      padding: 3rem 1.5rem;
+      text-align: center;
+      position: relative;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 15px 45px rgba(0,0,0,0.7);
+    }
+
+    .ornament {
+      position: absolute;
+      width: 35px;
+      height: 35px;
+      border: 2px solid var(--gold-primary);
+    }
+    .ornament-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+    .ornament-tr { top: 10px; right: 10px; border-left: none; border-bottom: none; }
+    .ornament-bl { bottom: 10px; left: 10px; border-right: none; border-top: none; }
+    .ornament-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+    .bismillah-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 2rem;
+      color: var(--gold-light);
+      margin-bottom: 0.3rem;
+    }
+
+    .sub-bismillah {
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c5c1b2;
+      margin-bottom: 1.5rem;
+    }
+
+    .quran-ayah {
+      font-style: italic;
+      font-size: 0.9rem;
+      color: #e6e2d3;
+      max-width: 480px;
+      margin: 0 auto 1.8rem auto;
+      line-height: 1.6;
+      border-top: 1px solid rgba(229, 185, 88, 0.25);
+      border-bottom: 1px solid rgba(229, 185, 88, 0.25);
+      padding: 0.8rem 0;
+    }
+
+    .host-intro {
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 1.2rem;
+    }
+
+    .groom-name, .bride-name {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.2rem;
+      background: linear-gradient(45deg, #fff3c4, #e5b958, #fffae0, #c8952b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+      margin: 0.2rem 0;
+    }
+
+    .connector {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.6rem;
+      color: var(--cream);
+      margin: -5px 0;
+      display: block;
+    }
+
+    .parentage {
+      font-size: 0.95rem;
+      color: #ddd9cd;
+      margin-top: 1.2rem;
+      line-height: 1.8;
+    }
+
+    .parentage strong {
+      color: var(--gold-primary);
+      font-weight: 600;
+    }
+
+    /* COUNTDOWN */
+    .countdown-wrap {
+      margin: 2.5rem 0;
+    }
+
+    .countdown-label {
+      font-family: 'Cinzel', serif;
+      font-size: 0.9rem;
+      letter-spacing: 2.5px;
+      color: var(--gold-primary);
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+
+    .timer-flex {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .timer-unit {
+      background: rgba(229, 185, 88, 0.08);
+      border: 1px solid rgba(229, 185, 88, 0.4);
+      border-radius: 10px;
+      padding: 10px 12px;
+      min-width: 62px;
+    }
+
+    .timer-num {
+      font-family: 'Cinzel', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      display: block;
+    }
+
+    .timer-sub {
+      font-size: 0.6rem;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #bcb8a8;
+    }
+
+    /* ITINERARY */
+    .events-header {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.6rem;
+      color: var(--gold-primary);
+      margin: 2.5rem 0 1.5rem 0;
+      letter-spacing: 2px;
+    }
+
+    .event-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(229, 185, 88, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .event-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.3rem;
+      color: var(--gold-primary);
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .event-date-highlight {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 0.6rem;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      border: 1px solid var(--gold-primary);
+      background: rgba(229, 185, 88, 0.1);
+      color: var(--gold-light);
+      text-decoration: none;
+      border-radius: 20px;
+      font-size: 0.75rem;
+    }
+
+    .rsvp-card {
+      background: radial-gradient(circle at center, rgba(229, 185, 88, 0.15) 0%, rgba(10, 45, 33, 0.9) 100%);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 14px;
+      padding: 1.8rem 1.2rem;
+      margin-top: 2.5rem;
+    }
+
+    .whatsapp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #25d366;
+      color: #fff;
+      font-weight: 600;
+      padding: 12px 24px;
+      border-radius: 30px;
+      text-decoration: none;
+      margin-top: 1rem;
+    }
+
+    .music-toggle {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      border: none;
+      color: var(--emerald-deep);
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="sparkle-canvas"></canvas>
+  <div class="bg-pattern"></div>
+
+  <button class="music-toggle" id="musicBtn">🔊</button>
+
+  <!-- ENVELOPE OVERLAY -->
+  <div id="envelope-screen" onclick="openInvitation()">
+    <div class="envelope-box" id="envelopeBox">
+      <div class="envelope-flap"></div>
+      <div class="envelope-inner-paper">
+        <span>INVITATION</span>
+        <strong style="color: #051a13; font-size: 1.1rem; margin-top: 4px;">M & A</strong>
+        <span style="font-size: 0.65rem; margin-top: 5px;">OCTOBER 2028</span>
+      </div>
+      <div class="wax-seal">
+        <span>M&A</span>
+      </div>
+    </div>
+    <div class="envelope-hint">Tap Anywhere to Open Card</div>
+  </div>
+
+  <!-- MAIN CARD -->
+  <main id="main-content">
+    <div class="royal-card">
+      <div class="ornament ornament-tl"></div>
+      <div class="ornament ornament-tr"></div>
+      <div class="ornament ornament-bl"></div>
+      <div class="ornament ornament-br"></div>
+
+      <div class="bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      <p class="sub-bismillah">In the name of Allah, the Most Gracious, the Most Merciful</p>
+
+      <p class="quran-ayah">
+        "And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them, and He has put love and mercy between your hearts."<br>
+        <span style="font-size: 0.8rem; color: var(--gold-primary);">— Surah Ar-Rum (30:21)</span>
+      </p>
+
+      <p class="host-intro">Soliciting your gracious presence with full family</p>
+
+      <h1 class="groom-name">Maseehur Rahman</h1>
+      <span class="connector">&</span>
+      <h1 class="bride-name">Ashia Sultana</h1>
+
+      <div class="parentage">
+        <p>Beloved Son of <strong>Mr. Ziaur Rahman</strong></p>
+        <p style="margin-top: 5px;">Beloved Daughter of <strong>Mr. Taj Mohammad</strong></p>
+      </div>
+
+      <!-- COUNTDOWN -->
+      <div class="countdown-wrap">
+        <div class="countdown-label">The Auspicious Union In</div>
+        <div class="timer-flex">
+          <div class="timer-unit"><span class="timer-num" id="d">00</span><span class="timer-sub">Days</span></div>
+          <div class="timer-unit"><span class="timer-num" id="h">00</span><span class="timer-sub">Hours</span></div>
+          <div class="timer-unit"><span class="timer-num" id="m">00</span><span class="timer-sub">Mins</span></div>
+          <div class="timer-unit"><span class="timer-num" id="s">00</span><span class="timer-sub">Secs</span></div>
+        </div>
+      </div>
+
+      <!-- SCHEDULE -->
+      <h2 class="events-header">Celebration Schedule</h2>
+
+      <div class="event-card">
+        <div class="event-title">Mehendi Ceremony</div>
+        <div class="event-date-highlight">Thursday, 19th October 2028</div>
+        <p style="font-size: 0.85rem; color: #cfcbbe;">An enchanting evening of henna, melodious duff, and vibrant celebrations.</p>
+        <div class="action-row">
+          <a href="https://maps.google.com" target="_blank" class="btn-action">📍 Venue Map</a>
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mehendi+-+Maseehur+%26+Ashia&dates=20281019T130000Z/20281019T170000Z" target="_blank" class="btn-action">📅 Add to Calendar</a>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-title">Nikaah & Wedding Feast</div>
+        <div class="event-date-highlight">Friday, 20th October 2028</div>
+        <p style="font-size: 0.85rem; color: #cfcbbe;">The solemnization of the sacred bond followed by traditional banquet.</p>
+        <div class="action-row">
+          <a href="https://maps.google.com" target="_blank" class="btn-action">📍 Venue Map</a>
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Shaadi+-+Maseehur+%26+Ashia&dates=20281020T140000Z/20281020T190000Z" target="_blank" class="btn-action">📅 Add to Calendar</a>
+        </div>
+      </div>
+
+      <div class="event-card">
+        <div class="event-title">Walima / Reception</div>
+        <div class="event-date-highlight">Saturday, 21st October 2028</div>
+        <p style="font-size: 0.85rem; color: #cfcbbe;">Join us to bless the newlyweds and enjoy an evening dinner.</p>
+        <div class="action-row">
+          <a href="https://maps.google.com" target="_blank" class="btn-action">📍 Venue Map</a>
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Walima+-+Maseehur+%26+Ashia&dates=20281021T140000Z/20281021T190000Z" target="_blank" class="btn-action">📅 Add to Calendar</a>
+        </div>
+      </div>
+
+      <!-- RSVP -->
+      <div class="rsvp-card">
+        <h3 style="font-family: 'Cinzel', serif; color: var(--gold-primary); font-size: 1.2rem;">Warm Regards</h3>
+        <p style="font-size: 0.9rem; color: #f0ebe1; margin-top: 6px;">Your prayers and presence are requested with full family.</p>
+        <a href="https://wa.me/?text=Assalamu%20Alaikum!%20InshaAllah%20we%20will%20attend%20the%20wedding%20celebrations%20of%20Maseehur%20%26%20Ashia%20in%20October%202028." target="_blank" class="whatsapp-btn">💬 RSVP via WhatsApp</a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let isOpened = false;
+
+    function openInvitation() {
+      if (isOpened) return;
+      isOpened = true;
+
+      const envelopeBox = document.getElementById('envelopeBox');
+      const envelopeScreen = document.getElementById('envelope-screen');
+      const mainContent = document.getElementById('main-content');
+
+      envelopeBox.classList.add('envelope-open');
+      playHarpChime();
+
+      setTimeout(() => {
+        envelopeScreen.style.opacity = '0';
+        envelopeScreen.style.transform = 'scale(1.05)';
+        mainContent.classList.add('show-content');
+      }, 600);
+
+      setTimeout(() => {
+        envelopeScreen.style.display = 'none';
+      }, 1400);
+    }
+
+    // 2028 Countdown
+    const weddingDate = new Date('October 20, 2028 19:00:00').getTime();
+    function updateTimer() {
+      const now = new Date().getTime();
+      const diff = weddingDate - now;
+
+      if (diff > 0) {
+        document.getElementById('d').innerText = String(Math.floor(diff / (1000 * 60 * 60 * 24))).padStart(2, '0');
+        document.getElementById('h').innerText = String(Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))).padStart(2, '0');
+        document.getElementById('m').innerText = String(Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))).padStart(2, '0');
+        document.getElementById('s').innerText = String(Math.floor((diff % (1000 * 60)) / 1000)).padStart(2, '0');
+      }
+    }
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    // Floating Sparkles
+    const canvas = document.getElementById('sparkle-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() { this.reset(); }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 2 + 0.5;
+        this.speedY = Math.random() * 0.6 + 0.3;
+        this.opacity = Math.random() * 0.7 + 0.3;
+      }
+      update() {
+        this.y -= this.speedY;
+        if (this.y < 0) { this.y = canvas.height; this.x = Math.random() * canvas.width; }
+      }
+      draw() {
+        ctx.fillStyle = `rgba(229, 185, 88, ${this.opacity})`;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    for (let i = 0; i < 35; i++) particles.push(new Particle());
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => { p.update(); p.draw(); });
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Sound
+    let isSoundOn = true;
+    function playHarpChime() {
+      if (!isSoundOn) return;
+      try {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        const audioCtx = new AudioContext();
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.1);
+          gain.gain.setValueAtTime(0, audioCtx.currentTime + idx * 0.1);
+          gain.gain.linearRampToValueAtTime(0.2, audioCtx.currentTime + idx * 0.1 + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.1 + 1.2);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + idx * 0.1);
+          osc.stop(audioCtx.currentTime + idx * 0.1 + 1.3);
+        });
+      } catch (e) {}
+    }
+
+    document.getElementById('musicBtn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      isSoundOn = !isSoundOn;
+      document.getElementById('musicBtn').innerText = isSoundOn ? '🔊' : '🔇';
+    });
+  </script>
+</body>
+            </html>
+            
