@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Maseehur & Ashia — The Royal Union 2028</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;700&family=Great+Vibes&family=Montserrat:wght@300;400;600&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --gold-primary: #e5b958;
+      --gold-light: #fff3c4;
+      --gold-dark: #997327;
+      --emerald-deep: #051a13;
+      --emerald-surface: #0a2d21;
+      --emerald-card: rgba(10, 45, 33, 0.85);
+      --cream: #faf7ee;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--emerald-deep);
+      color: var(--cream);
+      font-family: 'Montserrat', sans-serif;
+      overflow-x: hidden;
+      min-height: 100vh;
+      position: relative;
+    }
+
+    /* Background Particle Canvas */
+    #sparkle-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Ambient Islamic Arch Pattern */
+    .bg-pattern {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at 50% 20%, rgba(229, 185, 88, 0.08) 0%, transparent 60%),
+                  linear-gradient(180deg, #051a13 0%, #03110d 100%);
+      z-index: 0;
+    }
+
+    /* =========================================
+       1. INTERACTIVE ENVELOPE OPENING OVERLAY
+       ========================================= */
+    #envelope-screen {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #0a2e22 0%, #04140f 100%);
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1s cubic-bezier(0.77, 0, 0.175, 1), transform 1s ease;
+    }
+
+    .envelope-box {
+      position: relative;
+      width: 320px;
+      height: 220px;
+      background: #0d382a;
+      border: 2px solid var(--gold-primary);
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(229, 185, 88, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Flap geometry */
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 110px solid #144e3b;
+      transform-origin: top;
+      transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 4;
+      filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4));
+    }
+
+    .envelope-inner-paper {
+      position: absolute;
+      width: 85%;
+      height: 75%;
+      background: #fdfaf3;
+      border-radius: 4px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #0b3d2e;
+      transition: transform 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+
+    .envelope-inner-paper span {
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      color: var(--gold-dark);
+    }
+
+    .wax-seal {
+      position: absolute;
+      top: 80px;
+      width: 65px;
+      height: 65px;
+      background: radial-gradient(circle, #f3d078 0%, #aa771c 100%);
+      border-radius: 50%;
+      border: 2px solid #ffecb3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.5), inset 0 0 10px rgba(0,0,0,0.3);
+      animation: pulseGlow 2s infinite alternate;
+      cursor: pointer;
+    }
+
+    .wax-seal span {
+      font-family: 'Cinzel Decorative', cursive;
+      font-size: 1.1rem;
+      color: #3b2804;
+      font-weight: 700;
+    }
+
+    .envelope-hint {
+      margin-top: 2rem;
+      font-size: 0.9rem;
+      color: var(--gold-light);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: blinkText 1.5s infinite;
+    }
+
+    @keyframes pulseGlow {
+      from { transform: scale(1); box-shadow: 0 0 15px rgba(229, 185, 88, 0.4); }
+      to { transform: scale(1.06); box-shadow: 0 0 30px rgba(229, 185, 88, 0.8); }
+    }
+
+    @keyframes blinkText {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    /* Envelope Opening Animation Classes */
+    .envelope-open .envelope-flap {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+    .envelope-open .wax-seal {
+      transform: scale(0);
+      opacity: 0;
+      transition: all 0.4s ease;
+    }
+    .envelope-open .envelope-inner-paper {
+      transform: translateY(-80px) scale(1.08);
+    }
+
+    /* =========================================
+       2. MAIN WEDDING INVITATION VIEW
+       ========================================= */
+    #main-content {
+      position: relative;
+      z-index: 2;
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.2rem 5rem 1.2rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 1.2s ease 0.3s, transform 1.2s ease 0.3s;
+    }
+
+    .show-content {
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+
+    /* Gold Card Container */
+    .royal-card {
+      background: var(--emerald-card);
+      border: 1.5px solid var(--gold-primary);
+      border-radius: 20px;
+      padding: 3.5rem 1.8rem;
+      text-align: center;
+      position: relative;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 15px 45px rgba(0,0,0,0.7), inset 0 0 25px rgba(229, 185, 88, 0.08);
+    }
+
+    /* Corner Arabesque Ornaments */
+    .ornament {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      border: 2px solid var(--gold-primary);
+    }
+    .ornament-tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+    .ornament-tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+    .ornament-bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+    .ornament-br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+
+    .bismillah-arabic {
+      font-family: 'Amiri', serif;
+      font-size: 2.2rem;
+      color: var(--gold-light);
+      margin-bottom: 0.5rem;
+      text-shadow: 0 2px 10px rgba(229, 185, 88, 0.4);
+    }
+
+    .sub-bismillah {
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #c5c1b2;
+      margin-bottom: 2rem;
+    }
+
+    .quran-ayah {
+      font-style: italic;
+      font-size: 0.95rem;
+      color: #e6e2d3;
+      max-width: 500px;
+      margin: 0 auto 2rem auto;
+      line-height: 1.7;
+      border-top: 1px solid rgba(229, 185, 88, 0.25);
+      border-bottom: 1px solid rgba(229, 185, 88, 0.25);
+      padding: 1rem 0;
+    }
+
+    .host-intro {
+      font-size: 0.95rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--gold-light);
+      margin-bottom: 1.5rem;
+    }
+
+    /* Names with Golden Shimmer */
+    .groom-name, .bride-name {
+      font-family: 'Great Vibes', cursive;
+      font-size: 3.6rem;
+      background: linear-gradient(45deg, #fff3c4, #e5b958, #fffae0, #c8952b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.2;
+      margin: 0.2rem 0;
+      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.4));
+    }
+
+    .connector {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.8rem;
+      color: var(--cream);
+      margin: -5px 0;
+      display: block;
+    }
+
+    .parentage {
+      font-size: 1rem;
+      color: #ddd9cd;
+      margin-top: 1.5rem;
+      line-height: 1.8;
+    }
+
+    .parentage strong {
+      color: var(--gold-primary);
+      font-weight: 600;
+    }
+
+    /* =========================================
+       3. 2028 LIVE COUNTDOWN
+       ========================================= */
+    .countdown-wrap {
+      margin: 3rem 0;
+    }
+
+    .countdown-label {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem;
+      letter-spacing: 3px;
+      color: var(--gold-primary);
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+    }
+
+    .timer-flex {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .timer-unit {
+      background: rgba(229, 185, 88, 0.08);
+      border: 1px solid rgba(229, 185, 88, 0.4);
+      border-radius: 12px;
+      padding: 12px 14px;
+      min-width: 68px;
+    }
+
+    .timer-num {
+      font-family: 'Cinzel', serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--gold-light);
+      display: block;
+    }
+
+    .timer-sub {
+      font-size: 0.65rem;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: #bcb8a8;
+    }
+
+    /* =========================================
+       4. INTERACTIVE EVENT TIMELINE
+       ========================================= */
+    .events-header {
+      font-family: 'Cinzel Decorative', serif;
+      font-size: 1.8rem;
+      color: var(--gold-primary);
+      margin: 3rem 0 2rem 0;
+      letter-spacing: 2px;
+    }
+
+    .event-card {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(229, 185, 88, 0.3);
+      border-radius: 14px;
+      padding: 1.8rem 1.5rem;
+      margin-bottom: 1.8rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .event-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold-primary);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    .event-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1.4rem;
+      color: var(--gold-primary);
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+    }
+
+    .event-date-highlight {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--cream);
+      margin-bottom: 0.8rem;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-action {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid var(--gold-primary);
+      background: rgba(229, 185, 88, 0.1);
+      color: var(--gold-light);
+      text-decoration: none;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+      background: var(--gold-primary);
+      color: var(--emerald-deep);
+    }
+
+    /* RSVP & Blessings */
+    .rsvp-card {
+      background: radial-gradient(circle at center, rgba(229, 185, 88, 0.15) 0%, rgba(10, 45, 33, 0.9) 100%);
+      border: 1px dashed var(--gold-primary);
+      border-radius: 16px;
+      padding: 2.2rem 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .whatsapp-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #25d366;
+      color: #fff;
+      font-weight: 600;
+      padding: 14px 30px;
+      border-radius: 50px;
+      text-decoration: none;
+      margin-top: 1.2rem;
+      box-shadow: 0 8px 20px rgba(37, 211, 102, 0.35);
+      transition: transform 0.2s ease;
+    }
+
+    .whatsapp-btn:active {
+      transform: scale(0.97);
+    }
+
+    /* Sound / Music floating button */
+    .music-toggle {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--gold-primary);
+      border: none;
+      color: var(--emerald-deep);
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 100;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Sparkles -->
+  <canvas id="sparkle-canvas"></canvas>
+  <div class="bg-pattern"></div>
+
+  <!-- Music Toggle Button -->
+  <button class="music-toggle" id="musicBtn" title="Toggle Sound">🔊</button>
+
+  <!-- ==============================================
+       1. ENVELOPE / WAX SEAL FIRST-TOUCH EXPERIENCE
+       ============================================== -->
+  <div id="envelope-screen">
+    <div class="envelope-box" id="envelopeBox">
+      <div class="envelope-flap"></div>
+      <div class="envelope-inner-paper">
+        <span>INVITATION</span>
+        <strong style="color: #051a13; font-size: 1.1rem; margin-top: 5px;">M & A</strong>
+        <span style="font-size: 0.7rem; margin-top: 6px;">OCTOBER 2028</span>
+      </div>
+      <div class="wax-seal" id="waxSeal">
+        <span>M&A</span>
+      </div>
+    </div>
+    <div class="envelope-hint">Tap Wax Seal to Open</div>
+  </div>
+
+  <!-- ==============================================
+       2. FULL WEDDING INVITATION VIEW
+       ============================================== -->
+  <main id="main-content">
+    <div class="royal-card">
+      <div class="ornament ornament-tl"></div>
+      <div class="ornament ornament-tr"></div>
+      <div class="ornament ornament-bl"></div>
+      <div class="ornament ornament-br"></div>
+
+      <div class="bismillah-arabic">بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ</div>
+      <p class="sub-bismillah">In the name of Allah, the Most Gracious, the Most Merciful</p>
+
+      <p class="quran-ayah">
+        "And among His signs is that He created for you mates from among yourselves, that you may dwell in tranquility with them, and He has put love and mercy between your hearts."<br>
+        <span style="font-size: 0.8rem; color: var(--gold-primary);">— Surah Ar-Rum (30:21)</span>
+      </p>
+
+      <p class="host-intro">Soliciting your gracious presence with full family</p>
+
+      <h1 class="groom-name">Maseehur Rahman</h1>
+      <span class="connector">&</span>
+      <h1 class="bride-name">Ashia Sultana</h1>
+
+      <div class="parentage">
+        <p>Beloved Son of <strong>Mr. Ziaur Rahman</strong></p>
+        <p style="margin-top: 6px;">Beloved Daughter of <strong>Mr. Taj Mohammad</strong></p>
+      </div>
+
+      <!-- 2028 COUNTDOWN -->
+      <div class="countdown-wrap">
+        <div class="countdown-label">The Auspicious Union In</div>
+        <div class="timer-flex">
+          <div class="timer-unit">
+            <span class="timer-num" id="d">00</span>
+            <span class="timer-sub">Days</span>
+          </div>
+          <div class="timer-unit">
+            <span class="timer-num" id="h">00</span>
+            <span class="timer-sub">Hours</span>
+          </div>
+          <div class="timer-unit">
+            <span class="timer-num" id="m">00</span>
+            <span class="timer-sub">Mins</span>
+          </div>
+          <div class="timer-unit">
+            <span class="timer-num" id="s">00</span>
+            <span class="timer-sub">Secs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ITINERARY -->
+      <h2 class="events-header">Celebration Schedule</h2>
+
+      <!-- MEHENDI -->
+      <div class="event-card">
+        <div class="event-title">Mehendi Ceremony</div>
+        <div class="event-date-highlight">Thursday, 19th October 2028</div>
+        <p style="font-size: 0.9rem; color: #cfcbbe;">An enchanting evening of henna, melodious duff, and vibrant celebrations.</p>
+        <div class="action-row">
+          <a href="https://maps.google.com" target="_blank" class="btn-action">📍 Venue Map</a>
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Mehendi+-+Maseehur+%26+Ashia&dates=20281019T130000Z/20281019T170000Z&details=Mehendi+Ceremony+Celebrations" target="_blank" class="btn-action">📅 Add to Calendar</a>
+        </div>
+      </div>
+
+      <!-- SHAADI / NIKAAH -->
+      <div class="event-card">
+        <div class="event-title">Nikaah & Wedding Feast</div>
+        <div class="event-date-highlight">Friday, 20th October 2028</div>
+        <p style="font-size: 0.9rem; color: #cfcbbe;">The solemnization of the sacred bond followed by traditional royal banquet.</p>
+        <div class="action-row">
+          <a href="https://maps.google.com" target="_blank" class="btn-action">📍 Venue Map</a>
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Nikaah+Wedding+-+Maseehur+%26+Ashia&dates=20281020T140000Z/20281020T190000Z&details=Shaadi+and+Nikaah+Union" target="_blank" class="btn-action">📅 Add to Calendar</a>
+        </div>
+      </div>
+
+      <!-- RECEPTION / WALIMA -->
+      <div class="event-card">
+        <div class="event-title">Walima / Reception</div>
+        <div class="event-date-highlight">Saturday, 21st October 2028</div>
+        <p style="font-size: 0.9rem; color: #cfcbbe;">Join us to bless the newlyweds and celebrate with evening dinner.</p>
+        <div class="action-row">
+          <a href="https://maps.google.com" target="_blank" class="btn-action">📍 Venue Map</a>
+          <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=Walima+Reception+-+Maseehur+%26+Ashia&dates=20281021T140000Z/20281021T190000Z&details=Walima+Grand+Dinner" target="_blank" class="btn-action">📅 Add to Calendar</a>
+        </div>
+      </div>
+
+      <!-- RSVP SECTION -->
+      <div class="rsvp-card">
+        <h3 style="font-family: 'Cinzel', serif; color: var(--gold-primary); font-size: 1.3rem;">Warm Regards & Hospitality</h3>
+        <p style="font-size: 0.95rem; color: #f0ebe1; margin-top: 6px;">
+          Your prayers and attendance are the greatest gift. Kindly confirm your arrival:
+        </p>
+        <a href="https://wa.me/?text=Assalamu%20Alaikum!%20InshaAllah%20we%20will%20attend%20the%20wedding%20celebrations%20of%20Maseehur%20%26%20Ashia%20in%20October%202028." 
+           target="_blank" 
+           class="whatsapp-btn">
+          💬 RSVP via WhatsApp
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // ==========================================
+    // 1. INTERACTIVE ENVELOPE UNVEIL
+    // ==========================================
+    const waxSeal = document.getElementById('waxSeal');
+    const envelopeBox = document.getElementById('envelopeBox');
+    const envelopeScreen = document.getElementById('envelopeScreen');
+    const mainContent = document.getElementById('mainContent');
+
+    function openInvitation() {
+      envelopeBox.classList.add('envelope-open');
+      playHarpChime();
+
+      setTimeout(() => {
+        envelopeScreen.style.opacity = '0';
+        envelopeScreen.style.transform = 'scale(1.1)';
+        mainContent.classList.add('show-content');
+      }, 700);
+
+      setTimeout(() => {
+        envelopeScreen.style.display = 'none';
+      }, 1600);
+    }
+
+    waxSeal.addEventListener('click', openInvitation);
+    envelopeBox.addEventListener('click', openInvitation);
+
+    // ==========================================
+    // 2. LIVE COUNTDOWN TIMER (OCTOBER 20, 2028)
+    // ==========================================
+    const weddingDate = new Date('October 20, 2028 19:00:00').getTime();
+
+    function updateTimer() {
+      const now = new Date().getTime();
+      const diff = weddingDate - now;
+
+      if (diff > 0) {
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+        document.getElementById('d').innerText = String(days).padStart(2, '0');
+        document.getElementById('h').innerText = String(hours).padStart(2, '0');
+        document.getElementById('m').innerText = String(minutes).padStart(2, '0');
+        document.getElementById('s').innerText = String(seconds).padStart(2, '0');
+      } else {
+        document.querySelector('.countdown-wrap').innerHTML
